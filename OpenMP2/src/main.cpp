@@ -3,9 +3,13 @@
 #include <fstream>
 #include <omp.h>
 
-double calc(uint32_t x_last, uint32_t num_threads)
+double calc(uint32_t x_last, uint32_t num_threads_)
 {
-  return 0;
+    double sum = 0;
+    #pragma omp parrallel for num_threads(num_threads_) reduction(+:sum)
+    for (double i = x_last; i != 0; --i)
+        sum += 1/i;
+    return sum;
 }
 
 int main(int argc, char** argv)
