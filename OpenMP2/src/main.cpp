@@ -5,10 +5,27 @@
 
 double calc(uint32_t x_last, uint32_t num_threads_)
 {
-    double sum = 0;
-    #pragma omp parrallel for num_threads(num_threads_) reduction(+:sum)
-    for (double i = x_last; i != 0; --i)
-        sum += 1/i;
+    // double sum = 0;  
+    // omp_set_num_threads(num_threads_);
+   
+    // // #pragma omp parallel for num_threads(num_threads_) reduction(+:sum) 
+    // for (uint32_t i = x_last; i >= 1; --i){
+    //     sum += 1./i;
+    // }
+    double sum = 0;  
+    double* data = new double[x_last];
+    omp_set_num_threads(num_threads_);
+   
+    #pragma omp parallel for num_threads(num_threads_)
+    for (uint32_t i = x_last; i >= 1; --i){
+        data[i - 1] = 1./i;
+    }
+
+    for(uint32_t i = x_last; i >= 1; --i) {
+        sum += data[i - 1];
+    }
+
+    delete[] data;
     return sum;
 }
 
