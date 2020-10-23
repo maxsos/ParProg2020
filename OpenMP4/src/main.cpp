@@ -3,9 +3,33 @@
 #include <fstream>
 #include <omp.h>
 
-double calc(uint32_t x_last, uint32_t num_threads)
+double calc(uint32_t x_last, uint32_t num_threads_)
 {
-  return 0;
+  double sum = 0.;
+  double fact = 1.;
+  omp_set_num_threads(num_threads_);
+  if (x_last == 1 || x_last ==2)
+    --x_last;
+
+  double index[num_threads_ + 1], subsum[num_threads_ + 1] =  {0};
+  #pragma omp parallel for num_threads(num_threads_)
+    for (uint32_t i = 0; i <= num_threads_; ++i)
+      index[i] = 1;
+  
+
+  // Init coefs 
+  #pragma omp parallel for num_threads(num_threads_) ordered
+  for (uint32_t i = 0; i <= x_last; i++) {
+    index[omp_get_thread_num() + 1] /= i ? i : 1;
+    subsum[omp_get_thread_num()] += index[omp_get_thread_num() + 1];
+  }
+
+  for (uint32_t i = 0; i <= num_threads_; ++i) {
+    sum += fact * subsum[i];
+    fact *= index[i + 1];
+  }
+
+  return sum;
 }
 
 int main(int argc, char** argv)
