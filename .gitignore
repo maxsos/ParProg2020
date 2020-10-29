@@ -56,5 +56,6 @@ dkms.conf
 
 .ipynd_checkpoints
 .vscode/launch.json
-
+.vscode/*
+*/.ipynd*
 OpenMP1/.ipynb_checkpoints/parrprog_heatmap-checkpoint.ipynb
