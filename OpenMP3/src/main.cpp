@@ -37,6 +37,7 @@ double calc(double x0, double x1, double dx, uint32_t num_threads_)
   // return sum;  
   
   // Way of using less storage than previous oneS
+  /*
   double sum = 0.;
   int count = (x1 - x0) / dx;
   omp_set_num_threads(num_threads_);
@@ -51,6 +52,24 @@ double calc(double x0, double x1, double dx, uint32_t num_threads_)
     sum += data[i];
 
   return sum;  
+  // */
+//*
+  double sum = 0.;
+  int count = (x1 - x0) / dx;
+  int i = 0;
+  omp_set_num_threads(num_threads_);
+
+  #pragma omp parallel for num_threads(num_threads_) reduction(+:sum)
+  for (i = 0; i <= count; ++i) {
+    sum += func(x0 + dx * i) * dx;
+  }
+
+  if(i * dx < x1) {
+    sum += func()
+  }
+
+  return sum;  
+// */
 }
 
 int main(int argc, char** argv)
