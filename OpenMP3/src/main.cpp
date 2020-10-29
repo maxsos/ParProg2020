@@ -64,10 +64,6 @@ double calc(double x0, double x1, double dx, uint32_t num_threads_)
     sum += func(x0 + dx * i) * dx;
   }
 
-  if(i * dx < x1) {
-    sum += func()
-  }
-
   return sum;  
 // */
 }
