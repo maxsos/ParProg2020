@@ -53,5 +53,5 @@ dkms.conf
 
 # Build directories
 */build*
-
-.ipynd_checkpoints
+.vscode/*
+*/.ipynd*
