@@ -53,5 +53,13 @@ dkms.conf
 
 # Build directories
 */build*
+<<<<<<< HEAD
 .vscode/*
 */.ipynd*
+=======
+
+.ipynd_checkpoints
+.vscode/launch.json
+
+OpenMP1/.ipynb_checkpoints/parrprog_heatmap-checkpoint.ipynb
+>>>>>>> task2
