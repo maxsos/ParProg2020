@@ -60,8 +60,12 @@ double calc(double x0, double x1, double dx, uint32_t num_threads_)
   omp_set_num_threads(num_threads_);
 
   #pragma omp parallel for num_threads(num_threads_) reduction(+:sum)
-  for (i = 0; i <= count; ++i) {
+  for (i = 0; i < count; ++i) {
     sum += func(x0 + dx * i) * dx;
+  }
+
+  if (count * dx + x0 < x1) {
+    sum += func(x0 + count * dx) * ( dx); // (x1 - x0 - count * dx)
   }
 
   return sum;  
