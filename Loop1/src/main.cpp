@@ -7,8 +7,18 @@
 
 void calc(double* arr, uint32_t ySize, uint32_t xSize, int rank, int size)
 {
-  if (rank == 0 && size > 0)
+  if (size <= 0) {
+    std::cerr << "void called with size = " << size << std::endl;
+    exit(-1);
+  }
+
+  double* subarr = malloc(xSize * sizeof(double)); 
+
+  if (rank == 0)
   {
+    MPI_SCATTER(arr, ySize * xSize, MPI_DOUBLE, 
+                subarr, xSize, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    
     for (uint32_t y = 0; y < ySize; y++)
     {
       for (uint32_t x = 0; x < xSize; x++)
@@ -16,8 +26,17 @@ void calc(double* arr, uint32_t ySize, uint32_t xSize, int rank, int size)
         arr[y*xSize + x] = sin(0.00001*arr[y*xSize + x]);
       }
     }
+
+    MPI_GATHER(sкubarr, xSize, MPI_DOUBLE, 
+               arr, ySize * xSize, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  } else 
+  {
+
   }
+
 }
+
+
 
 int main(int argc, char** argv)
 {
