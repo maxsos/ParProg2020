@@ -1,6 +1,7 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
+#include <stdio.h>
 #include <mpi.h>
 #include <unistd.h>
 #include <cmath>
@@ -8,34 +9,46 @@
 void calc(double* arr, uint32_t ySize, uint32_t xSize, int rank, int size)
 {
   if (size <= 0) {
-    std::cerr << "void called with size = " << size << std::endl;
+    std::cerr << "Void called with size = " << size << std::endl;
     exit(-1);
   }
 
-  double* subarr = malloc(xSize * sizeof(double)); 
+  MPI_Bcast(&ySize, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  MPI_Bcast(&xSize, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  int subSize = ySize * xSize/size;
 
-  if (rank == 0)
-  {
-    MPI_SCATTER(arr, ySize * xSize, MPI_DOUBLE, 
-                subarr, xSize, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    
-    for (uint32_t y = 0; y < ySize; y++)
-    {
-      for (uint32_t x = 0; x < xSize; x++)
-      {
-        arr[y*xSize + x] = sin(0.00001*arr[y*xSize + x]);
-      }
-    }
+  double* subArr = (double *)malloc(subSize * sizeof(double)); 
+  
+  MPI_Scatter(arr, subSize, MPI_DOUBLE, 
+            subArr, subSize, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
-    MPI_GATHER(sкubarr, xSize, MPI_DOUBLE, 
-               arr, ySize * xSize, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-  } else 
-  {
-
+  for(int i = 0; i < subSize; ++i) {
+    subArr[i] = sin(0.00001*subArr[i]);
   }
 
-}
+  MPI_Gather(subArr, subSize, MPI_DOUBLE, 
+            arr, subSize, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  
+  if (rank == 0 && ySize * xSize % size) {
+    for(int i = subSize * size; i < ySize * xSize; ++i) {
+      arr[i] = sin(0.00001*arr[i]);
+    }
+  }
 
+  free(subArr);
+
+
+  // if (rank == 0 && size > 0)
+  // {
+  //   for (uint32_t y = 0; y < ySize; y++)
+  //   {
+  //     for (uint32_t x = 0; x < xSize; x++)
+  //     {
+  //       arr[y*xSize + x] = sin(0.00001*arr[y*xSize + x]);
+  //     }
+  //   }
+  // }
+}
 
 
 int main(int argc, char** argv)
