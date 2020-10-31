@@ -11,61 +11,24 @@ double func(double x)
 
 double calc(double x0, double x1, double dx, uint32_t num_threads_)
 {
-  // Without parallel compution
-  // double sum = 0.;
-  // for (double i = x0; i < x1; i += dx) {
-  //     sum += func(i);
-  // }
-  // return sum * dx;
-
-  // Way of using many storage
-  // double sum = 0.;
-  // int count = (x1 - x0) / dx;
-  // double* data = new double[count ? count : 1];
-
-  // #pragma omp parallel for num_threads(num_threads_) 
-  // for (int i = 0; i <= count; ++i) {
-  //   data[i] = sin(x0 + dx * i) * dx;
-  // }
-
-  // for (int i = 0; i <= count; i++)
-  //   sum += data[i];
-
-  // delete[] data;
-  // // std::cout.precision(14);
-  // // std::cout << "Sum = " << sum << std::endl;
-  // return sum;  
-  
-  // Way of using less storage than previous oneS
-  /*
-  double sum = 0.;
-  int count = (x1 - x0) / dx;
-  omp_set_num_threads(num_threads_);
-  double data[num_threads_] = {0};
-
-  #pragma omp parallel for num_threads(num_threads_) 
-  for (int i = 0; i <= count; ++i) {
-    data[omp_get_thread_num()] += func(x0 + dx * i) * dx;
-  }
-
-  for (uint32_t i = 0; i < num_threads_; i++)
-    sum += data[i];
-
-  return sum;  
-  // */
-//*
-  double sum = 0.;
+  double sum = dx * func(x0)/2;
   int count = (x1 - x0) / dx;
   int i = 0;
   omp_set_num_threads(num_threads_);
 
   #pragma omp parallel for num_threads(num_threads_) reduction(+:sum)
-  for (i = 0; i <= count; ++i) {
-    sum += func(x0 + dx * i) * dx;
+  for (i = 1; i < count; ++i) {
+    if (i != count - 1)
+      sum += func(x0 + dx * i) * dx;
+    else 
+      sum += func(x0 + dx * i) * dx/2;
+  }
+
+  if (count * dx + x0 < x1) {
+    sum += (func(x0 + (count-1) * dx) + func(x0 + count * dx)) * dx/2;
   }
 
   return sum;  
-// */
 }
 
 int main(int argc, char** argv)
